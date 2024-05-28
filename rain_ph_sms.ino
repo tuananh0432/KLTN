@@ -3,7 +3,7 @@
 #define SerialAT Serial1
 #define SerialMon Serial
 #define DUMP_AT_COMMANDS
-#define SMS_TARGET "+84396442362"  // target phone number
+#define SMS_TARGET "+84*********"  // target phone number
 #define GSM_PIN ""
 const char apn[] = "YOUR-APN";  //SET TO YOUR APN
 const char gprsUser[] = "";
@@ -16,6 +16,11 @@ const char gprsPass[] = "";
 #define samplingInterval 20
 #define printInterval 800
 #define ArrayLenth 40  //times of collection
+#define UART_BAUD 115200
+#define PIN_DTR 25
+#define PIN_TX 27
+#define PIN_RX 26
+#define PWR_PIN 4
 
 #include "ThingSpeak.h"
 #include <WiFi.h>
@@ -34,29 +39,20 @@ const unsigned long debounceDelay = 100;
 int pHArray[ArrayLenth];
 int pHArrayIndex = 0;
 
+bool rainWarning = false;
+bool pHLow = false;
+bool pHHigh = false;
+bool gpsLocation = false;
+
 // WIFI
 const char *ssid = "Vo tuyen 217";     // your network SSID (name)
 const char *password = "votuyen217@";  // your network password
-// const char *ssid = "TA0432";
-// const char *password = "xlql-lnax-n707";
 WiFiClient client;
 
 // ThingSpeak
 unsigned long myChannelNumber = 2519307;         // thingspeak Channel ID
 const char *myWriteAPIKey = "LEZA8G40BLR4R00W";  //Write API Key
 TinyGsm modem(SerialAT);
-
-
-#define UART_BAUD 115200
-#define PIN_DTR 25
-#define PIN_TX 27
-#define PIN_RX 26
-#define PWR_PIN 4
-
-bool rainWarning = false;
-bool pHLow = false;
-bool pHHigh = false;
-bool gpsLocation = false;
 
 void IRAM_ATTR get_rain() {
   unsigned long currentTime = millis();
@@ -154,8 +150,6 @@ void loop() {
   }
 
   if (millis() - printTime > printInterval) {
-    // Serial.print("Voltage: ");
-    // Serial.print(voltage, 4);
     Serial.print("  pH value: ");
     Serial.println(pHValue, 2);
     ThingSpeak.setField(2, pHValue);
